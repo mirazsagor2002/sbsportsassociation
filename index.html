@@ -1,0 +1,2135 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>এস বি ক্রীড়া সংস্থা - অডিয়েন্স ড্যাশবোর্ড</title>
+    <style>
+        /* বেসিক রিসেট এবং গ্লোবাল স্টাইল */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
+            color: #333;
+            text-align: center;
+            padding: 20px;
+            overflow-x: hidden;
+            transition: background 0.5s ease-in-out;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 40px 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+            transition: transform 0.3s ease-in-out, opacity 0.5s ease-in-out;
+            margin-bottom: 20px;
+            box-sizing: border-box; /* Padding and border included in element's total width and height */
+            display: flex; /* Flexbox for logo and content alignment */
+            flex-direction: column;
+            align-items: center; /* Center items horizontally */
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+        }
+
+        .logo {
+            width: 150px; /* Default logo size */
+            height: auto;
+            margin-bottom: 20px; /* Space below the logo */
+        }
+
+        /* Responsive logo sizing for smaller containers */
+        #loginContainer .logo,
+        #audienceLoginContainer .logo,
+        #registrationContainer .logo,
+        #forgotPasswordContainer .logo {
+            width: 120px;
+        }
+
+        #adminPanel .logo,
+        #audienceDashboard .logo {
+            width: 100px; /* Slightly smaller for dashboards */
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            font-size: 2.8em;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        h2 {
+            font-size: 2.2em;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        p {
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: #555;
+            margin-bottom: 30px;
+        }
+
+        /* অ্যানিমেটেড বাটন স্টাইল */
+        .animated-button {
+            background-color: transparent;
+            border: 2px solid #3498db;
+            color: #3498db;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            outline: none;
+            margin: 10px;
+            min-width: 150px;
+            box-sizing: border-box;
+        }
+
+        .animated-button.secondary {
+            border-color: #f39c12;
+            color: #f39c12;
+        }
+        .animated-button.secondary::before {
+            background-color: #f39c12;
+        }
+        .animated-button.secondary:hover {
+            color: #fff;
+            border-color: #e67e22;
+        }
+
+        .animated-button.danger {
+            border-color: #e74c3c;
+            color: #e74c3c;
+        }
+        .animated-button.danger::before {
+            background-color: #e74c3c;
+        }
+        .animated-button.danger:hover {
+            color: #fff;
+            border-color: #c0392b;
+        }
+
+
+        .animated-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #3498db;
+            z-index: -1;
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .animated-button:hover::before {
+            transform: scaleX(1);
+            transform-origin: right;
+        }
+
+        .animated-button:active {
+            transform: scale(0.95);
+            transition: transform 0.1s ease-out;
+        }
+
+        /* অ্যাডমিন প্যানেল এবং অডিয়েন্স ড্যাশবোর্ড স্টাইল */
+        #adminPanel, #audienceDashboard, #registrationContainer, #audienceLoginContainer, #forgotPasswordContainer {
+            background-color: #ffffff;
+            padding: 40px 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            max-width: 900px;
+            width: 100%;
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease-in-out;
+            margin-top: 20px;
+            text-align: left;
+            box-sizing: border-box;
+        }
+
+        #adminPanel.visible, #audienceDashboard.visible, #registrationContainer.visible, #audienceLoginContainer.visible, #forgotPasswordContainer.visible {
+            display: flex; /* Changed to flex for centering logo */
+            flex-direction: column;
+            align-items: center; /* Center items */
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        #adminPanel h2, #audienceDashboard h2 {
+            font-size: 2.2em;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        /* কমন লিস্ট সেকশন স্টাইল (উপদেষ্টা ও নির্বাচন কমিশন উভয়ের জন্য) */
+        .list-section {
+            margin-top: 30px;
+            border-top: 1px solid #eee;
+            padding-top: 30px;
+            width: 100%; /* Ensure list sections take full width */
+            text-align: center; /* Center the list titles */
+        }
+
+        .list-section h3 {
+            font-size: 1.8em;
+            color: #34495e;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* ফর্মগুলো শুধুমাত্র অ্যাডমিন প্যানেলে দেখা যাবে */
+        .member-form, .transaction-form, .donation-form, .equipment-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 30px;
+            justify-content: center;
+            align-items: flex-end;
+            width: 100%; /* Ensure forms take full width */
+        }
+        /* অডিয়েন্স ড্যাশবোর্ডে ফর্মগুলো হাইড করা */
+        #audienceDashboard .member-form,
+        #audienceDashboard .transaction-form,
+        #audienceDashboard .donation-form,
+        #audienceDashboard .equipment-form {
+            display: none;
+        }
+
+        .member-form input[type="text"],
+        .member-form input[type="date"],
+        .transaction-form input[type="text"],
+        .transaction-form input[type="number"],
+        .transaction-form input[type="date"],
+        .transaction-form select,
+        .donation-form input[type="text"],
+        .donation-form select,
+        .login-form input[type="text"],
+        .login-form input[type="password"],
+        /* রেজিস্ট্রেশন ফর্মের ইনপুট */
+        #registrationForm input[type="text"],
+        #registrationForm input[type="date"],
+        #registrationForm input[type="tel"],
+        #registrationForm input[type="password"],
+        #registrationForm input[type="file"],
+        /* স্পোর্টস ইক্যুইপমেন্ট ইনপুট */
+        .equipment-form input[type="text"],
+        .equipment-form input[type="number"],
+        .equipment-form select,
+        /* অডিয়েন্স লগইন ফর্মের ইনপুট */
+        #audienceLoginForm input[type="tel"],
+        #audienceLoginForm input[type="password"],
+        /* পাসওয়ার্ড ভুলে যাওয়া ফর্মের ইনপুট */
+        #forgotPasswordForm input[type="tel"] {
+            flex-grow: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+            max-width: 250px;
+        }
+        .transaction-form input[type="text"] {
+            flex-basis: 100%; /* বিবরণ পুরো প্রস্থ নেবে */
+            max-width: none;
+        }
+        .donation-form input[type="text"].full-width-input { /* পূর্ণ প্রস্থের ইনপুট */
+            flex-basis: 100%;
+            max-width: none;
+        }
+
+        .member-form button, .transaction-form button, .donation-form button, .login-form button, #registrationForm button, .equipment-form button, #audienceLoginForm button, #forgotPasswordForm button {
+            padding: 12px 25px;
+            font-size: 1em;
+            min-width: 120px;
+        }
+        .login-form { /* Login form takes full width to center inputs */
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+        .login-form input[type="text"], .login-form input[type="password"] {
+            max-width: 300px; /* লগইন ইনপুটের জন্য একটু বেশি প্রস্থ */
+            width: 100%;
+        }
+        .login-form button {
+            max-width: 300px;
+            width: 100%;
+        }
+        .login-message, .registration-message, .audience-login-message, .forgot-password-message { /* নতুন মেসেজ ক্লাস যুক্ত করা হয়েছে */
+            color: #e74c3c;
+            margin-top: -15px;
+            margin-bottom: 15px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        /* রেজিস্ট্রেশন ফর্ম স্টাইল */
+        #registrationForm, #audienceLoginForm, #forgotPasswordForm {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center; /* ইনপুটগুলো সেন্টারে থাকবে */
+            width: 100%;
+        }
+        #registrationForm div, #audienceLoginForm div, #forgotPasswordForm div {
+            width: 100%;
+            max-width: 350px; /* ইনপুট ফিল্ডগুলোর জন্য নির্দিষ্ট প্রস্থ */
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start; /* লেবেলগুলো বামে থাকবে */
+        }
+        #registrationForm label, #audienceLoginForm label, #forgotPasswordForm label {
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+            font-size: 0.95em;
+        }
+        #registrationForm input[type="file"] {
+            padding: 8px 0; /* ফাইল ইনপুটের প্যাডিং */
+        }
+        #profileImagePreview {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ddd;
+            margin-bottom: 15px;
+            background-color: #f0f0f0;
+            display: block; /* ইমেজ সেন্টারে আনার জন্য */
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+
+        .member-table, .transaction-table, .donation-table, .equipment-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .member-table th, .member-table td,
+        .transaction-table th, .transaction-table td,
+        .donation-table th, .donation-table td,
+        .equipment-table th, .equipment-table td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            text-align: left;
+        }
+
+        .member-table th, .transaction-table th, .donation-table th, .equipment-table th {
+            background-color: #f8f9fa;
+            color: #555;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.9em;
+        }
+
+        .member-table tr:last-child td,
+        .transaction-table tr:last-child td,
+        .donation-table tr:last-child td,
+        .equipment-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .member-table tbody tr:hover,
+        .transaction-table tbody tr:hover,
+        .donation-table tbody tr:hover,
+        .equipment-table tbody tr:hover {
+            background-color: #f0f8ff;
+        }
+
+        /* শুধুমাত্র অ্যাডমিন প্যানেলে অ্যাকশন বাটন দেখা যাবে */
+        .member-table .actions button,
+        .transaction-table .actions button,
+        .donation-table .actions button,
+        .equipment-table .actions button {
+            margin-right: 8px;
+            padding: 8px 15px;
+            font-size: 0.9em;
+            border-radius: 5px;
+            min-width: auto;
+            white-space: nowrap;
+        }
+        /* অডিয়েন্স ড্যাশবোর্ডে অ্যাকশন কলাম হাইd করা */
+        #audienceDashboard .member-table th:last-child,
+        #audienceDashboard .member-table td:last-child,
+        #audienceDashboard .transaction-table th:last-child,
+        #audienceDashboard .transaction-table td:last-child,
+        #audienceDashboard .donation-table th:last-child,
+        #audienceDashboard .donation-table td:last-child,
+        #audienceDashboard .equipment-table th:last-child,
+        #audienceDashboard .equipment-table td:last-child {
+            display: none;
+        }
+        /* অডিয়েন্স ড্যাশবোর্ডে মোবাইল ভিউতেও অ্যাকশন কলাম হাইড রাখা */
+        @media (max-width: 768px) {
+            #audienceDashboard .member-table td[data-label="কার্যক্রম"],
+            #audienceDashboard .transaction-table td[data-label="কার্যক্রম"],
+            #audienceDashboard .donation-table td[data-label="কার্যক্রম"],
+            #audienceDashboard .equipment-table td[data-label="কার্যক্রম"] {
+                display: none;
+            }
+        }
+        
+        /* ব্যালেন্স ডিসপ্লে */
+        .balance-display {
+            background-color: #e6f7ff;
+            border: 1px solid #b3e0ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .balance-display p {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .balance-display strong {
+            font-size: 2.5em;
+            color: #007bff;
+            display: block;
+            margin-top: 10px;
+        }
+        .balance-display strong.negative {
+            color: #e74c3c; /* নেগেটিভ ব্যালেন্সের জন্য লাল রঙ */
+        }
+        .balance-display strong.positive {
+            color: #28a745; /* পজিটিভ ব্যালেন্সের জন্য সবুজ রঙ */
+        }
+
+        /* আয়-ব্যয় রঙ */
+        .income-row {
+            color: #28a745; /* সবুজ */
+            font-weight: bold;
+        }
+        .expense-row {
+            color: #dc3545; /* লাল */
+            font-weight: bold;
+        }
+
+        /* লোডিং স্ক্রিন */
+        #loadingScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #f0f4f8; /* Same as body background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 1;
+            transition: opacity 0.5s ease-out;
+        }
+
+        #loadingScreen.hidden {
+            opacity: 0;
+            pointer-events: none; /* Allows clicking through after fade out */
+        }
+
+        #loadingScreen .logo {
+            width: 180px;
+            animation: pulse 1.5s infinite alternate; /* Simple pulse animation */
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.05); }
+        }
+
+        /* মোবাইল রেসপন্সিভনেস */
+        @media (max-width: 768px) {
+            #adminPanel, #loginContainer, #audienceDashboard, #registrationContainer, #audienceLoginContainer, #forgotPasswordContainer, #mainContent {
+                max-width: 100%;
+                padding: 20px 15px;
+            }
+
+            .container .logo {
+                width: 100px; /* Adjust logo size for smaller screens */
+            }
+
+            #loadingScreen .logo {
+                width: 150px; /* Adjust loading screen logo size */
+            }
+
+            .member-form, .transaction-form, .donation-form, .login-form, #registrationForm, .equipment-form, #audienceLoginForm, #forgotPasswordForm {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .member-form input[type="text"],
+            .member-form input[type="date"],
+            .member-form button,
+            .transaction-form input[type="text"],
+            .transaction-form input[type="number"],
+            .transaction-form input[type="date"],
+            .transaction-form select,
+            .transaction-form button,
+            .donation-form input[type="text"],
+            .donation-form select,
+            .donation-form button,
+            .login-form input[type="text"],
+            .login-form input[type="password"],
+            .login-form button,
+            /* রেজিস্ট্রেশন ফর্মের ইনপুট */
+            #registrationForm input[type="text"],
+            #registrationForm input[type="date"],
+            #registrationForm input[type="tel"],
+            #registrationForm input[type="password"],
+            #registrationForm input[type="file"],
+            #registrationForm button,
+            /* স্পোর্টস ইক্যুইপমেন্ট ইনপুট */
+            .equipment-form input[type="text"],
+            .equipment-form input[type="number"],
+            .equipment-form select,
+            .equipment-form button,
+            /* অডিয়েন্স লগইন ফর্মের ইনপুট */
+            #audienceLoginForm input[type="tel"],
+            #audienceLoginForm input[type="password"],
+            #audienceLoginForm button,
+            /* পাসওয়ার্ড ভুলে যাওয়া ফর্মের ইনপুট */
+            #forgotPasswordForm input[type="tel"],
+            #forgotPasswordForm button {
+                max-width: 100%;
+                width: 100%;
+            }
+            #registrationForm div, #audienceLoginForm div, #forgotPasswordForm div { /* ইনপুট ফিল্ডের div */
+                max-width: 100%;
+                width: 100%;
+            }
+            .transaction-form input[type="text"],
+            .donation-form input[type="text"].full-width-input {
+                max-width: 100%; /* মোবাইল ভিউতে বিবরণও পুরো প্রস্থ নেবে */
+            }
+
+
+            .member-table, .member-table thead, .member-table tbody, .member-table th, .member-table td, .member-table tr,
+            .transaction-table, .transaction-table thead, .transaction-table tbody, .transaction-table th, .transaction-table td, .transaction-table tr,
+            .donation-table, .donation-table thead, .donation-table tbody, .donation-table th, .donation-table td, .donation-table tr,
+            .equipment-table, .equipment-table thead, .equipment-table tbody, .equipment-table th, .equipment-table td, .equipment-table tr {
+                display: block;
+            }
+
+            .member-table thead tr, .transaction-table thead tr, .transaction-table thead tr, .donation-table thead tr, .equipment-table thead tr {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+
+            .member-table tr, .transaction-table tr, .donation-table tr, .equipment-table tr {
+                margin-bottom: 15px;
+                border: 1px solid #ddd;
+                border-radius: 10px;
+                overflow: hidden;
+            }
+
+            .member-table td, .transaction-table td, .donation-table td, .equipment-table td {
+                border: none;
+                border-bottom: 1px solid #eee;
+                position: relative;
+                padding-left: 50%;
+                text-align: right;
+            }
+
+            .member-table td::before, .transaction-table td::before, .donation-table td::before, .equipment-table td::before {
+                content: attr(data-label);
+                position: absolute;
+                left: 0;
+                width: 45%;
+                padding-left: 15px;
+                font-weight: bold;
+                text-align: left;
+                color: #555;
+            }
+
+            .member-table td:last-child, .transaction-table td:last-child, .donation-table td:last-child, .equipment-table td:last-child {
+                border-bottom: none;
+            }
+
+            .member-table .actions, .transaction-table .actions, .donation-table .actions, .equipment-table .actions {
+                text-align: center;
+                padding-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body><script type="text/javascript">
+	atOptions = {
+		'key' : '29512b6824ea5c8e1bb087a89880e771',
+		'format' : 'iframe',
+		'height' : 50,
+		'width' : 320,
+		'params' : {}
+	};
+</script>
+<script type="text/javascript" src="//www.highperformanceformat.com/29512b6824ea5c8e1bb087a89880e771/invoke.js"></script>
+    <div id="loadingScreen">
+        <img src="image.png" alt="এস বি ক্রীড়া সংস্থা লোগো" class="logo">
+    </div>
+
+    <div id="mainContent" class="container" style="display: none;">
+        <img src="image.png" alt="এস বি ক্রীড়া সংস্থা লোগো" class="logo">
+        <h1>এস বি ক্রীড়া সংস্থা</h1>
+        <p>এটি আপনার প্রথম আধুনিক ওয়েব অ্যাপ্লিকেশন। এখানে আপনি একটি সুন্দর ইন্টারফেস এবং অ্যানিমেটেড বাটন দেখতে পাচ্ছেন। আসুন, এটিকে আরও উন্নত করি!</p>
+        <button class="animated-button" onclick="showAudienceLoginScreen()">শুরু করুন</button>
+    </div>
+
+    <div id="loginContainer" class="container" style="display: none;">
+        <img src="image.png" alt="এস বি ক্রীড়া সংস্থা লোগো" class="logo">
+        <h2>এস বি ক্রীড়া সংস্থা - অ্যাডমিন লগইন</h2>
+        <div class="login-form">
+            <input type="text" id="usernameInput" placeholder="ইউজারনেম লিখুন">
+            <input type="password" id="passwordInput" placeholder="পাসওয়ার্ড লিখুন">
+            <button class="animated-button" onclick="adminLogin()">লগইন করুন</button>
+        </div>
+        <p id="loginMessage" class="login-message" style="display: none;"></p>
+        <div style="text-align: center; margin-top: 20px;">
+            <button class="animated-button secondary" onclick="showAudienceLoginScreen()">অডিয়েন্স লগইন</button>
+        </div>
+    </div>
+
+    <div id="audienceLoginContainer" class="container" style="display: none;">
+        <img src="image.png" alt="এস বি ক্রীড়া সংস্থা লোগো" class="logo">
+        <h2>এস বি ক্রীড়া সংস্থা - অডিয়েন্স লগইন</h2>
+        <form id="audienceLoginForm">
+            <div>
+                <label for="audienceMobileLoginInput">মোবাইল নাম্বার:</label>
+                <input type="tel" id="audienceMobileLoginInput" placeholder="01XXXXXXXXX" pattern="01[0-9]{9}" title="১১ ডিজিটের মোবাইল নম্বর দিন (যেমন: 01712345678)" required>
+            </div>
+            <div>
+                <label for="audiencePasswordLoginInput">পাসওয়ার্ড:</label>
+                <input type="password" id="audiencePasswordLoginInput" placeholder="পাসওয়ার্ড লিখুন" required>
+            </div>
+            <button type="submit" class="animated-button">লগইন করুন</button>
+        </form>
+        <p id="audienceLoginMessage" class="audience-login-message" style="display: none;"></p>
+        <div style="text-align: center; margin-top: 20px;">
+            <button class="animated-button secondary" onclick="showRegistrationScreen()">রেজিস্ট্রেশন করুন</button>
+            <button class="animated-button secondary" onclick="showForgotPasswordScreen()">পাসওয়ার্ড ভুলে গেছেন?</button>
+        </div>
+        <div style="text-align: center; margin-top: 10px;">
+            <button class="animated-button" onclick="showLoginScreen()">অ্যাডমিন লগইন</button>
+        </div>
+    </div>
+
+    <div id="forgotPasswordContainer" class="container" style="display: none;">
+        <img src="image.png" alt="এস বি ক্রীড়া সংস্থা লোগো" class="logo">
+        <h2>এস বি ক্রীড়া সংস্থা - পাসওয়ার্ড রিসেট</h2>
+        <form id="forgotPasswordForm">
+            <div>
+                <label for="forgotPasswordMobileInput">রেজিস্টার্ড মোবাইল নাম্বার:</label>
+                <input type="tel" id="forgotPasswordMobileInput" placeholder="01XXXXXXXXX" pattern="01[0-9]{9}" title="১১ ডিজিটের রেজিস্টার্ড মোবাইল নম্বর দিন" required>
+            </div>
+            <button type="submit" class="animated-button">পাসওয়ার্ড রিসেট লিংক পাঠান</button>
+        </form>
+        <p id="forgotPasswordMessage" class="forgot-password-message" style="display: none;"></p>
+        <div style="text-align: center; margin-top: 20px;">
+            <button class="animated-button secondary" onclick="showAudienceLoginScreen()">লগইন স্ক্রিনে ফিরে যান</button>
+        </div>
+    </div>
+
+    <div id="registrationContainer" class="container" style="display: none;">
+        <img src="image.png" alt="এস বি ক্রীড়া সংস্থা লোগো" class="logo">
+        <h2>এস বি ক্রীড়া সংস্থা - অডিয়েন্স রেজিস্ট্রেশন</h2>
+        <img id="profileImagePreview" src="http://placehold.it/120x120" alt="প্রোফাইল ছবি প্রিভিউ">
+        <form id="registrationForm">
+            <div>
+                <label for="regProfilePicInput">প্রোফাইল ছবি (ঐচ্ছিক):</label>
+                <input type="file" id="regProfilePicInput" accept="image/*" onchange="previewProfileImage(event)">
+            </div>
+            <div>
+                <label for="regNameInput">নাম:</label>
+                <input type="text" id="regNameInput" placeholder="আপনার পুরো নাম লিখুন" required>
+            </div>
+            <div>
+                <label for="regDobInput">জন্মতারিখ:</label>
+                <input type="date" id="regDobInput" required>
+            </div>
+            <div>
+                <label for="regMobileInput">মোবাইল নাম্বার:</label>
+                <input type="tel" id="regMobileInput" placeholder="01XXXXXXXXX" pattern="01[0-9]{9}" title="১১ ডিজিটের মোবাইল নম্বর দিন (যেমন: 01712345678)" required>
+            </div>
+            <div>
+                <label for="regPasswordInput">পাসওয়ার্ড:</label>
+                <input type="password" id="regPasswordInput" placeholder="পাসওয়ার্ড লিখুন" required minlength="6">
+            </div>
+            <div>
+                <label for="regConfirmPasswordInput">পাসওয়ার্ড নিশ্চিত করুন:</label>
+                <input type="password" id="regConfirmPasswordInput" placeholder="পাসওয়ার্ড পুনরায় লিখুন" required>
+            </div>
+            <button type="submit" class="animated-button">রেজিস্টার করুন</button>
+        </form>
+        <p id="registrationMessage" class="registration-message" style="display: none;"></p>
+        <div style="text-align: center; margin-top: 20px;">
+            <p>আপনার কি ইতিমধ্যে অ্যাকাউন্ট আছে? <button class="animated-button secondary" onclick="showAudienceLoginScreen()">লগইন করুন</button></p>
+        </div>
+    </div>
+
+    <button class="animated-button" id="toggleAdminButton" onclick="toggleAdminPanel()" style="display: none; margin-top: 20px;">অ্যাডমিন প্যানেল</button>
+    
+    <div id="adminPanel">
+        <img src="image.png" alt="এস বি ক্রীড়া সংস্থা লোগো" class="logo">
+        <h2>এস বি ক্রীড়া সংস্থা - অ্যাডমিন প্যানেল</h2>
+
+        <div class="list-section">
+            <h3>উপদেষ্টা পরিষদ সদস্য তালিকা</h3>
+
+            <div class="member-form">
+                <input type="text" id="advisorNameInput" placeholder="সদস্যের নাম লিখুন">
+                <input type="text" id="advisorDesignationInput" placeholder="পদবী লিখুন (ঐচ্ছিক)">
+                <button class="animated-button" id="addAdvisorButton" onclick="addAdvisor()">সদস্য যুক্ত করুন</button>
+                <button class="animated-button secondary" id="updateAdvisorButton" style="display: none;" onclick="updateAdvisor()">পরিবর্তন করুন</button>
+                <button class="animated-button danger" id="cancelAdvisorEditButton" style="display: none;" onclick="cancelAdvisorEdit()">বাতিল করুন</button>
+            </div>
+
+            <table class="member-table">
+                <thead>
+                    <tr>
+                        <th>নাম</th>
+                        <th>পদবী</th>
+                        <th>কার্যক্রম</th>
+                    </tr>
+                </thead>
+                <tbody id="advisorList">
+                    </tbody>
+            </table>
+        </div>
+
+        <div class="list-section">
+            <h3>এস বি ক্রীড়া সংস্থা - নির্বাচন কমিশন সদস্য তালিকা</h3>
+
+            <div class="member-form">
+                <input type="text" id="ecMemberNameInput" placeholder="সদস্যের নাম লিখুন">
+                <input type="text" id="ecMemberDesignationInput" placeholder="পদবী লিখুন (ঐচ্ছিক)">
+                <input type="date" id="ecMemberJoinDateInput" title="যোগদানের তারিখ (ঐচ্ছিক)">
+                <input type="date" id="ecMemberEndDateInput" title="অবসরের তারিখ (ঐচ্ছিক)">
+                <button class="animated-button" id="addEcMemberButton" onclick="addEcMember()">সদস্য যুক্ত করুন</button>
+                <button class="animated-button secondary" id="updateEcMemberButton" style="display: none;" onclick="updateEcMember()">পরিবর্তন করুন</button>
+                <button class="animated-button danger" id="cancelEcMemberEditButton" style="display: none;" onclick="cancelEcMemberEdit()">বাতিল করুন</button>
+            </div>
+
+            <table class="member-table">
+                <thead>
+                    <tr>
+                        <th>নাম</th>
+                        <th>পদবী</th>
+                        <th>যোগদান</th>
+                        <th>অবসর</th>
+                        <th>কার্যক্রম</th>
+                    </tr>
+                </thead>
+                <tbody id="ecMemberList">
+                    </tbody>
+            </table>
+        </div>
+
+        <div class="list-section">
+            <h3>এস বি ক্রীড়া সংস্থা - ২০২৫-২৭ কার্যকরি পরিষদের সদস্য তালিকা</h3>
+
+            <div class="member-form">
+                <input type="text" id="executiveCouncilNameInput" placeholder="সদস্যের নাম লিখুন">
+                <input type="text" id="executiveCouncilDesignationInput" placeholder="পদবী লিখুন (ঐচ্ছিক)">
+                <button class="animated-button" id="addExecutiveCouncilButton" onclick="addExecutiveCouncilMember()">সদস্য যুক্ত করুন</button>
+                <button class="animated-button secondary" id="updateExecutiveCouncilButton" style="display: none;" onclick="updateExecutiveCouncilMember()">পরিবর্তন করুন</button>
+                <button class="animated-button danger" id="cancelExecutiveCouncilEditButton" style="display: none;" onclick="cancelExecutiveCouncilEdit()">বাতিল করুন</button>
+            </div>
+
+            <table class="member-table">
+                <thead>
+                    <tr>
+                        <th>নাম</th>
+                        <th>পদবী</th>
+                        <th>কার্যক্রম</th>
+                    </tr>
+                </thead>
+                <tbody id="executiveCouncilList">
+                    </tbody>
+            </table>
+        </div>
+
+        <div class="list-section">
+            <h3>এস বি ক্রীড়া সংস্থা - খেলাধুলার সরঞ্জাম তালিকা</h3>
+
+            <div class="equipment-form">
+                <input type="text" id="equipmentNameInput" placeholder="সরঞ্জামের নাম">
+                <select id="equipmentCategoryInput">
+                    <option value="football">ফুটবল</option>
+                    <option value="cricket">ক্রিকেট</option>
+                    <option value="badminton">ব্যাডমিন্টন</option>
+                    <option value="other">অন্যান্য</option>
+                </select>
+                <input type="number" id="equipmentQuantityInput" placeholder="পরিমাণ" min="1" value="1">
+                <button class="animated-button" id="addEquipmentButton" onclick="addEquipment()">সরঞ্জাম যুক্ত করুন</button>
+                <button class="animated-button secondary" id="updateEquipmentButton" style="display: none;" onclick="updateEquipment()">পরিবর্তন করুন</button>
+                <button class="animated-button danger" id="cancelEquipmentEditButton" style="display: none;" onclick="cancelEquipmentEdit()">বাতিল করুন</button>
+            </div>
+
+            <table class="equipment-table">
+                <thead>
+                    <tr>
+                        <th>সরঞ্জামের নাম</th>
+                        <th>ধরণ</th>
+                        <th>পরিমাণ</th>
+                        <th>কার্যক্রম</th>
+                    </tr>
+                </thead>
+                <tbody id="equipmentList">
+                    </tbody>
+            </table>
+        </div>
+
+        <div class="list-section">
+            <h3>এস বি ক্রীড়া সংস্থা - আয়-ব্যয় হিসাব ও বর্তমান ব্যালেন্স</h3>
+
+            <div class="balance-display">
+                <p>বর্তমান ব্যালেন্স:</p>
+                <strong id="currentBalance">৳ 0.00</strong>
+            </div>
+
+            <div class="transaction-form">
+                <input type="text" id="transactionDescriptionInput" placeholder="বিবরণ লিখুন (যেমন: মাসিক চাঁদা, কম্পিউটার কেনা)">
+                <input type="number" id="transactionAmountInput" placeholder="পরিমাণ লিখুন (৳)" step="0.01">
+                <select id="transactionTypeInput">
+                    <option value="income">আয়</option>
+                    <option value="expense">ব্যয়</option>
+                </select>
+                <input type="date" id="transactionDateInput" title="তারিখ">
+                <button class="animated-button" id="addTransactionButton" onclick="addTransaction()">লেনদেন যুক্ত করুন</button>
+                <button class="animated-button secondary" id="updateTransactionButton" style="display: none;" onclick="updateTransaction()">পরিবর্তন করুন</button>
+                <button class="animated-button danger" id="cancelTransactionEditButton" style="display: none;" onclick="cancelTransactionEdit()">বাতিল করুন</button>
+            </div>
+
+            <table class="transaction-table">
+                <thead>
+                    <tr>
+                        <th>তারিখ</th>
+                        <th>বিবরণ</th>
+                        <th>পরিমাণ</th>
+                        <th>ধরণ</th>
+                        <th>কার্যক্রম</th>
+                    </tr>
+                </thead>
+                <tbody id="transactionList">
+                    </tbody>
+            </table>
+        </div>
+
+        <div class="list-section">
+            <h3>এস বি ক্রীড়া সংস্থা - পেশাদার ডাইনামিক ডোনেশন</h3>
+
+            <div class="donation-form">
+                <input type="text" id="donationPlatformInput" placeholder="প্লাটফর্মের নাম (যেমন: বিকাশ, নগদ)" class="full-width-input">
+                <input type="text" id="donationNumberInput" placeholder="নম্বর (যেমন: 018xxxxxxx)" pattern="[0-9]{11}" title="১১ ডিজিটের মোবাইল নম্বর দিন">
+                <select id="donationAccountTypeInput">
+                    <option value="personal">পার্সোনাল</option>
+                    <option value="agent">এজেন্ট</option>
+                    <option value="merchant">মার্চেন্ট</option>
+                </select>
+                <button class="animated-button" id="addDonationButton" onclick="addDonationNumber()">নম্বর যুক্ত করুন</button>
+                <button class="animated-button secondary" id="updateDonationButton" style="display: none;" onclick="updateDonationNumber()">পরিবর্তন করুন</button>
+                <button class="animated-button danger" id="cancelDonationEditButton" style="display: none;" onclick="cancelDonationEdit()">বাতিল করুন</button>
+            </div>
+
+            <table class="donation-table">
+                <thead>
+                    <tr>
+                        <th>প্লাটফর্ম</th>
+                        <th>নম্বর</th>
+                        <th>ধরণ</th>
+                        <th>কার্যক্রম</th>
+                    </tr>
+                </thead>
+                <tbody id="donationNumberList">
+                    </tbody>
+            </table>
+        </div>
+
+
+        <div style="text-align: center; margin-top: 30px;">
+            <button class="animated-button" onclick="adminLogout()">লগআউট করুন</button>
+        </div>
+    </div>
+
+    <div id="audienceDashboard">
+        <img src="image.png" alt="এস বি ক্রীড়া সংস্থা লোগো" class="logo">
+        <h2>এস বি ক্রীড়া সংস্থা - আমাদের তথ্য</h2>
+
+        <div class="list-section">
+            <h3>উপদেষ্টা পরিষদ সদস্য তালিকা</h3>
+            <table class="member-table">
+                <thead>
+                    <tr>
+                        <th>নাম</th>
+                        <th>পদবী</th>
+                        </tr>
+                </thead>
+                <tbody id="audienceAdvisorList">
+                    </tbody>
+            </table>
+        </div>
+
+        <div class="list-section">
+            <h3>এস বি ক্রীড়া সংস্থা - নির্বাচন কমিশন সদস্য তালিকা</h3>
+            <table class="member-table">
+                <thead>
+                    <tr>
+                        <th>নাম</th>
+                        <th>পদবী</th>
+                        <th>যোগদান</th>
+                        <th>অবসর</th>
+                        </tr>
+                </thead>
+                <tbody id="audienceEcMemberList">
+                    </tbody>
+            </table>
+        </div>
+
+        <div class="list-section">
+            <h3>এস বি ক্রীড়া সংস্থা - ২০২৫-২৭ কার্যকরি পরিষদের সদস্য তালিকা</h3>
+            <table class="member-table">
+                <thead>
+                    <tr>
+                        <th>নাম</th>
+                        <th>পদবী</th>
+                        </tr>
+                </thead>
+                <tbody id="audienceExecutiveCouncilList">
+                    </tbody>
+            </table>
+        </div>
+
+        <div class="list-section">
+            <h3>এস বি ক্রীড়া সংস্থা - খেলাধুলার সরঞ্জাম তালিকা</h3>
+            <table class="equipment-table">
+                <thead>
+                    <tr>
+                        <th>সরঞ্জামের নাম</th>
+                        <th>ধরণ</th>
+                        <th>পরিমাণ</th>
+                        </tr>
+                    </tr>
+                </thead>
+                <tbody id="audienceEquipmentList">
+                    </tbody>
+            </table>
+        </div>
+
+        <div class="list-section">
+            <h3>এস বি ক্রীড়া সংস্থা - আয়-ব্যয় হিসাব ও বর্তমান ব্যালেন্স</h3>
+
+            <div class="balance-display">
+                <p>বর্তমান ব্যালেন্স:</p>
+                <strong id="audienceCurrentBalance">৳ 0.00</strong>
+            </div>
+
+            <table class="transaction-table">
+                <thead>
+                    <tr>
+                        <th>তারিখ</th>
+                        <th>বিবরণ</th>
+                        <th>পরিমাণ</th>
+                        <th>ধরণ</th>
+                        </tr>
+                </thead>
+                <tbody id="audienceTransactionList">
+                    </tbody>
+            </table>
+        </div>
+
+        <div class="list-section">
+            <h3>এস বি ক্রীড়া সংস্থা - পেশাদার ডাইনামিক ডোনেশন</h3>
+            <table class="donation-table">
+                <thead>
+                    <tr>
+                        <th>প্লাটফর্ম</th>
+                        <th>নম্বর</th>
+                        <th>ধরণ</th>
+                        </tr>
+                </thead>
+                <tbody id="audienceDonationNumberList">
+                    </tbody>
+            </table>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <button class="animated-button" onclick="showAudienceLoginScreen()">লগইন করুন</button>
+            <button class="animated-button secondary" onclick="showRegistrationScreen()">রেজিস্ট্রেশন করুন</button>
+        </div>
+    </div>
+
+    <script>
+        // স্থির ইউজারনেম এবং পাসওয়ার্ড
+        const ADMIN_USERNAME = 'admin';
+        const ADMIN_PASSWORD = 'password';
+
+        // DOM উপাদান
+        const loadingScreen = document.getElementById('loadingScreen'); // নতুন লোডিং স্ক্রিন
+        const mainContent = document.getElementById('mainContent');
+        const loginContainer = document.getElementById('loginContainer'); // অ্যাডমিন লগইন
+        const audienceLoginContainer = document.getElementById('audienceLoginContainer'); // অডিয়েন্স লগইন (নতুন)
+        const forgotPasswordContainer = document.getElementById('forgotPasswordContainer'); // পাসওয়ার্ড ভুলে গেছেন (নতুন)
+        const adminPanel = document.getElementById('adminPanel');
+        const audienceDashboard = document.getElementById('audienceDashboard');
+        const registrationContainer = document.getElementById('registrationContainer');
+        const toggleAdminButton = document.getElementById('toggleAdminButton');
+
+        // অ্যাডমিন লগইন উপাদান
+        const usernameInput = document.getElementById('usernameInput');
+        const passwordInput = document.getElementById('passwordInput');
+        const loginMessage = document.getElementById('loginMessage');
+
+        // অডিয়েন্স লগইন উপাদান (নতুন)
+        const audienceMobileLoginInput = document.getElementById('audienceMobileLoginInput');
+        const audiencePasswordLoginInput = document.getElementById('audiencePasswordLoginInput');
+        const audienceLoginForm = document.getElementById('audienceLoginForm');
+        const audienceLoginMessage = document.getElementById('audienceLoginMessage');
+
+        // পাসওয়ার্ড ভুলে গেছেন উপাদান (নতুন)
+        const forgotPasswordMobileInput = document.getElementById('forgotPasswordMobileInput');
+        const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+        const forgotPasswordMessage = document.getElementById('forgotPasswordMessage');
+
+        // রেজিস্ট্রেশন ফর্মের উপাদান
+        const regProfilePicInput = document.getElementById('regProfilePicInput');
+        const profileImagePreview = document.getElementById('profileImagePreview');
+        const regNameInput = document.getElementById('regNameInput');
+        const regDobInput = document.getElementById('regDobInput');
+        const regMobileInput = document.getElementById('regMobileInput');
+        const regPasswordInput = document.getElementById('regPasswordInput');
+        const regConfirmPasswordInput = document.getElementById('regConfirmPasswordInput');
+        const registrationForm = document.getElementById('registrationForm');
+        const registrationMessage = document.getElementById('registrationMessage');
+
+        // উপদেষ্টা পরিষদ এর জন্য উপাদান ও ভেরিয়েবল
+        const advisorNameInput = document.getElementById('advisorNameInput');
+        const advisorDesignationInput = document.getElementById('advisorDesignationInput');
+        const addAdvisorButton = document.getElementById('addAdvisorButton');
+        const updateAdvisorButton = document.getElementById('updateAdvisorButton');
+        const cancelAdvisorEditButton = document.getElementById('cancelAdvisorEditButton');
+        const advisorList = document.getElementById('advisorList'); // অ্যাডমিন
+        const audienceAdvisorList = document.getElementById('audienceAdvisorList'); // অডিয়েন্স
+
+        let advisors = [];
+        let editingAdvisorIndex = -1;
+
+        // নির্বাচন কমিশন এর জন্য উপাদান ও ভেরিয়েবল
+        const ecMemberNameInput = document.getElementById('ecMemberNameInput');
+        const ecMemberDesignationInput = document.getElementById('ecMemberDesignationInput');
+        const ecMemberJoinDateInput = document.getElementById('ecMemberJoinDateInput');
+        const ecMemberEndDateInput = document.getElementById('ecMemberEndDateInput');
+        const addEcMemberButton = document.getElementById('addEcMemberButton');
+        const updateEcMemberButton = document.getElementById('updateEcMemberButton');
+        const cancelEcMemberEditButton = document.getElementById('cancelEcMemberEditButton');
+        const ecMemberList = document.getElementById('ecMemberList'); // অ্যাডমিন
+        const audienceEcMemberList = document.getElementById('audienceEcMemberList'); // অডিয়েন্স
+
+        let ecMembers = [];
+        let editingEcMemberIndex = -1;
+
+        // ২০২৫-২৭ কার্যকরি পরিষদের জন্য উপাদান ও ভেরিয়েবল
+        const executiveCouncilNameInput = document.getElementById('executiveCouncilNameInput');
+        const executiveCouncilDesignationInput = document.getElementById('executiveCouncilDesignationInput');
+        const addExecutiveCouncilButton = document.getElementById('addExecutiveCouncilButton');
+        const updateExecutiveCouncilButton = document.getElementById('updateExecutiveCouncilButton');
+        const cancelExecutiveCouncilEditButton = document.getElementById('cancelExecutiveCouncilEditButton');
+        const executiveCouncilList = document.getElementById('executiveCouncilList'); // অ্যাডমিন
+        const audienceExecutiveCouncilList = document.getElementById('audienceExecutiveCouncilList'); // অডিয়েন্স
+
+        let executiveCouncilMembers = [];
+        let editingExecutiveCouncilMemberIndex = -1;
+
+        // খেলাধুলার সরঞ্জাম এর জন্য উপাদান ও ভেরিয়েবল
+        const equipmentNameInput = document.getElementById('equipmentNameInput');
+        const equipmentCategoryInput = document.getElementById('equipmentCategoryInput');
+        const equipmentQuantityInput = document.getElementById('equipmentQuantityInput');
+        const addEquipmentButton = document.getElementById('addEquipmentButton');
+        const updateEquipmentButton = document.getElementById('updateEquipmentButton');
+        const cancelEquipmentEditButton = document.getElementById('cancelEquipmentEditButton');
+        const equipmentList = document.getElementById('equipmentList'); // অ্যাডমিন
+        const audienceEquipmentList = document.getElementById('audienceEquipmentList'); // অডিয়েন্স
+
+        let sportsEquipment = [];
+        let editingEquipmentIndex = -1;
+
+
+        // আয়-ব্যয় হিসাবের জন্য উপাদান ও ভেরিয়েবল
+        const transactionDescriptionInput = document.getElementById('transactionDescriptionInput');
+        const transactionAmountInput = document.getElementById('transactionAmountInput');
+        const transactionTypeInput = document.getElementById('transactionTypeInput');
+        const transactionDateInput = document.getElementById('transactionDateInput');
+        const addTransactionButton = document.getElementById('addTransactionButton');
+        const updateTransactionButton = document.getElementById('updateTransactionButton');
+        const cancelTransactionEditButton = document.getElementById('cancelTransactionEditButton');
+        const transactionList = document.getElementById('transactionList'); // অ্যাডমিন
+        const audienceTransactionList = document.getElementById('audienceTransactionList'); // অডিয়েন্স
+        const currentBalanceDisplay = document.getElementById('currentBalance'); // অ্যাডমিন
+        const audienceCurrentBalanceDisplay = document.getElementById('audienceCurrentBalance'); // অডিয়েন্স
+
+        let transactions = [];
+        let editingTransactionIndex = -1;
+
+        // পেশাদার ডাইনামিক ডোনেশনের জন্য উপাদান ও ভেরিয়েবল
+        const donationPlatformInput = document.getElementById('donationPlatformInput');
+        const donationNumberInput = document.getElementById('donationNumberInput');
+        const donationAccountTypeInput = document.getElementById('donationAccountTypeInput');
+        const addDonationButton = document.getElementById('addDonationButton');
+        const updateDonationButton = document.getElementById('updateDonationButton');
+        const cancelDonationEditButton = document.getElementById('cancelDonationEditButton');
+        const donationNumberList = document.getElementById('donationNumberList'); // অ্যাডমিন
+        const audienceDonationNumberList = document.getElementById('audienceDonationNumberList'); // অডিয়েন্স
+
+        let donationNumbers = [];
+        let editingDonationNumberIndex = -1;
+
+        // অডিয়েন্স ডেটা সংরক্ষণের জন্য অ্যারে
+        let registeredAudiences = []; // রেজিস্টার্ড অডিয়েন্স ডেটা
+
+
+        // --- ডেটা পার্সিস্টেন্স ফাংশন (localStorage) ---
+        function saveData() {
+            localStorage.setItem('advisors', JSON.stringify(advisors));
+            localStorage.setItem('ecMembers', JSON.stringify(ecMembers));
+            localStorage.setItem('executiveCouncilMembers', JSON.stringify(executiveCouncilMembers));
+            localStorage.setItem('sportsEquipment', JSON.stringify(sportsEquipment));
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+            localStorage.setItem('donationNumbers', JSON.stringify(donationNumbers));
+            localStorage.setItem('registeredAudiences', JSON.stringify(registeredAudiences));
+        }
+
+        function loadData() {
+            const storedAdvisors = localStorage.getItem('advisors');
+            if (storedAdvisors) advisors = JSON.parse(storedAdvisors);
+
+            const storedEcMembers = localStorage.getItem('ecMembers');
+            if (storedEcMembers) ecMembers = JSON.parse(storedEcMembers);
+
+            const storedExecutiveCouncilMembers = localStorage.getItem('executiveCouncilMembers');
+            if (storedExecutiveCouncilMembers) executiveCouncilMembers = JSON.parse(storedExecutiveCouncilMembers);
+
+            const storedSportsEquipment = localStorage.getItem('sportsEquipment');
+            if (storedSportsEquipment) sportsEquipment = JSON.parse(storedSportsEquipment);
+
+            const storedTransactions = localStorage.getItem('transactions');
+            if (storedTransactions) transactions = JSON.parse(storedTransactions);
+
+            const storedDonationNumbers = localStorage.getItem('donationNumbers');
+            if (storedDonationNumbers) donationNumbers = JSON.parse(storedDonationNumbers);
+
+            const storedAudiences = localStorage.getItem('registeredAudiences');
+            if (storedAudiences) registeredAudiences = JSON.parse(storedAudiences);
+            
+            // যদি কোন ডেটা না থাকে, ডেমো ডেটা যোগ করুন
+            if (advisors.length === 0) {
+                advisors.push({ name: 'অধ্যাপক ড. রবিন আহমেদ', designation: 'চেয়ারম্যান' });
+                advisors.push({ name: 'সারজিনা ইসলাম', designation: 'সদস্য সচিব' });
+                advisors.push({ name: 'ড. নুসরাত জাহান', designation: 'সদস্য' });
+            }
+            if (ecMembers.length === 0) {
+                ecMembers.push({ name: 'নাসির উদ্দিন', designation: 'প্রধান নির্বাচন কমিশনার', joinDate: '2024-11-22', endDate: '' });
+                ecMembers.push({ name: 'মোঃ আনোয়ারুল ইসলাম সরকার', designation: 'নির্বাচন কমিশনার', joinDate: '2024-11-21', endDate: '' });
+                ecMembers.push({ name: 'বেগম তাহমিদা আহমেদ', designation: 'নির্বাচন কমিশনার', joinDate: '2024-11-21', endDate: '' });
+            }
+            if (executiveCouncilMembers.length === 0) {
+                executiveCouncilMembers.push({ name: 'জনাব ক', designation: 'সভাপতি' });
+                executiveCouncilMembers.push({ name: 'জনাব খ', designation: 'সাধারণ সম্পাদক' });
+                executiveCouncilMembers.push({ name: 'জনাব গ', designation: 'কোষাধ্যক্ষ' });
+            }
+            if (sportsEquipment.length === 0) {
+                sportsEquipment.push({ name: 'ফুটবল', category: 'football', quantity: 10 });
+                sportsEquipment.push({ name: 'ক্রিকেট ব্যাট', category: 'cricket', quantity: 5 });
+                sportsEquipment.push({ name: 'ব্যাডমিন্টন র‍্যাকেট', category: 'badminton', quantity: 8 });
+                sportsEquipment.push({ name: 'দড়ি লাফানোর', category: 'other', quantity: 15 });
+            }
+            if (transactions.length === 0) {
+                transactions.push({ description: 'প্রাথমিক তহবিল', amount: 5000, type: 'income', date: '2025-01-01' });
+                transactions.push({ description: 'কম্পিউটার কেনা', amount: 1500, type: 'expense', date: '2025-01-05' });
+                transactions.push({ description: 'মাসিক চাঁদা - জানুয়ারি', amount: 1000, type: 'income', date: '2025-01-10' });
+                transactions.push({ description: 'কার্যালয় ভাড়া - জানুয়ারি', amount: 800, type: 'expense', date: '2025-01-15' });
+            }
+            if (donationNumbers.length === 0) {
+                donationNumbers.push({ platform: 'বিকাশ', number: '01878971348', accountType: 'personal' });
+                donationNumbers.push({ platform: 'নগদ', number: '01878971348', accountType: 'personal' });
+                donationNumbers.push({ platform: 'উপায়', number: '01878971348', accountType: 'personal' });
+            }
+            if (registeredAudiences.length === 0) {
+                registeredAudiences.push({ profilePic: '', name: 'ডেমো অডিয়েন্স', dob: '2000-01-01', mobile: '01700000000', password: 'password123' });
+            }
+
+            // নিশ্চিত করুন যে তারিখ ইনপুট ফর্ম্যাটের জন্য সঠিক ডিফল্ট মান সেট করা আছে
+            const today = new Date().toISOString().split('T')[0];
+            ecMemberJoinDateInput.value = today;
+            transactionDateInput.value = today;
+            regDobInput.value = '2000-01-01'; // Default date of birth
+        }
+
+        // --- লগইন এবং ভিউ ম্যানেজমেন্ট ফাংশনালিটি ---
+
+        // পেজ লোড হওয়ার সময় লগইন স্ট্যাটাস চেক করা
+        window.onload = function() {
+            loadData(); // সব ডেটা লোড করুন
+            setTimeout(() => {
+                loadingScreen.classList.add('hidden'); // লোডিং স্ক্রিন অদৃশ্য করুন
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none'; // লোডিং স্ক্রিন DOM থেকে সরান
+                    if (localStorage.getItem('isAdminLoggedIn') === 'true') {
+                        showAdminPanel();
+                    } else if (localStorage.getItem('isAudienceLoggedIn') === 'true') {
+                        showAudienceDashboard();
+                    } else {
+                        showAudienceLoginScreen(); // ডিফল্টভাবে অডিয়েন্স লগইন স্ক্রিন দেখাবে
+                    }
+                }, 500); // Wait for the fade-out transition to complete
+            }, 2000); // Show loading screen for 2 seconds
+        };
+
+        function showLoginScreen() {
+            hideAllScreens();
+            loginContainer.style.display = 'flex'; // Changed to flex
+            loginContainer.classList.add('visible');
+            document.body.style.background = 'linear-gradient(135deg, #f0f4f8, #d9e2ec)';
+            loginMessage.style.display = 'none';
+            usernameInput.value = '';
+            passwordInput.value = '';
+        }
+
+        function showAudienceLoginScreen() {
+            hideAllScreens();
+            audienceLoginContainer.style.display = 'flex'; // Changed to flex
+            audienceLoginContainer.classList.add('visible');
+            document.body.style.background = 'linear-gradient(135deg, #f0f4f8, #d9e2ec)';
+            audienceLoginMessage.style.display = 'none';
+            audienceMobileLoginInput.value = '';
+            audiencePasswordLoginInput.value = '';
+        }
+
+        function showForgotPasswordScreen() {
+            hideAllScreens();
+            forgotPasswordContainer.style.display = 'flex'; // Changed to flex
+            forgotPasswordContainer.classList.add('visible');
+            document.body.style.background = 'linear-gradient(135deg, #f0f4f8, #d9e2ec)';
+            forgotPasswordMessage.style.display = 'none';
+            forgotPasswordMobileInput.value = '';
+        }
+
+        function showRegistrationScreen() {
+            hideAllScreens();
+            registrationContainer.style.display = 'flex'; // Changed to flex
+            registrationContainer.classList.add('visible');
+            document.body.style.background = 'linear-gradient(135deg, #f0f4f8, #d9e2ec)';
+            registrationMessage.style.display = 'none';
+            resetRegistrationForm();
+        }
+
+        function showAdminPanel() {
+            hideAllScreens();
+            adminPanel.classList.add('visible');
+            toggleAdminButton.style.display = 'inline-block';
+            toggleAdminButton.textContent = 'অডিয়েন্স ড্যাশবোর্ড দেখুন'; // অ্যাডমিন প্যানেল থেকে অডিয়েন্স ড্যাশবোর্ডে যাওয়ার জন্য
+            document.body.style.background = 'linear-gradient(135deg, #e0f2f7, #c1e0ed)';
+
+            // অ্যাডমিন প্যানেলের ডেটা রেন্ডার করা
+            renderAdvisors();
+            renderEcMembers();
+            renderExecutiveCouncilMembers();
+            renderSportsEquipment();
+            renderTransactions();
+            updateBalance();
+            renderDonationNumbers();
+            saveData(); // ডেটা সেভ করুন
+        }
+
+        function showAudienceDashboard() {
+            hideAllScreens();
+            audienceDashboard.classList.add('visible');
+            toggleAdminButton.style.display = 'inline-block';
+            toggleAdminButton.textContent = 'অ্যাডমিন লগইন'; // অডিয়েন্স ড্যাশবোর্ডে থাকলে এই বাটন অ্যাডমিন লগইনের জন্য
+            document.body.style.background = 'linear-gradient(135deg, #f0f4f8, #d9e2ec)';
+
+            // অডিয়েন্স ড্যাশবোর্ডের জন্য ডেটা রেন্ডার করা
+            renderAudienceAdvisors();
+            renderAudienceEcMembers();
+            renderAudienceExecutiveCouncilMembers();
+            renderAudienceSportsEquipment();
+            renderAudienceTransactions();
+            updateAudienceBalance();
+            renderAudienceDonationNumbers();
+        }
+
+        function hideAllScreens() {
+            mainContent.style.display = 'none';
+            loginContainer.classList.remove('visible');
+            audienceLoginContainer.classList.remove('visible');
+            forgotPasswordContainer.classList.remove('visible');
+            adminPanel.classList.remove('visible');
+            audienceDashboard.classList.remove('visible');
+            registrationContainer.classList.remove('visible');
+            toggleAdminButton.style.display = 'none';
+        }
+
+
+        function adminLogin() {
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value.trim();
+
+            if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+                localStorage.setItem('isAdminLoggedIn', 'true');
+                localStorage.removeItem('isAudienceLoggedIn'); // অ্যাডমিন লগইন হলে অডিয়েন্স লগইন বাতিল
+                loginMessage.style.display = 'none';
+                alert('সফলভাবে লগইন করা হয়েছে!');
+                showAdminPanel();
+            } else {
+                loginMessage.textContent = 'ভুল ইউজারনেম বা পাসওয়ার্ড।';
+                loginMessage.style.display = 'block';
+                usernameInput.value = '';
+                passwordInput.value = '';
+                usernameInput.focus();
+            }
+        }
+
+        function audienceLogin(event) { // অডিয়েন্স লগইন ফাংশন, ইভেন্ট প্যারামিটার যুক্ত করা হয়েছে
+            if (event) event.preventDefault(); // ফর্ম সাবমিট হলে ডিফল্ট আচরণ বন্ধ করুন
+
+            const mobile = audienceMobileLoginInput.value.trim();
+            const password = audiencePasswordLoginInput.value;
+
+            audienceLoginMessage.style.display = 'none';
+
+            if (!mobile || !password) {
+                audienceLoginMessage.textContent = 'মোবাইল নাম্বার এবং পাসওয়ার্ড লিখুন।';
+                audienceLoginMessage.style.display = 'block';
+                return;
+            }
+
+            const foundUser = registeredAudiences.find(user => user.mobile === mobile && user.password === password);
+
+            if (foundUser) {
+                localStorage.setItem('isAudienceLoggedIn', 'true');
+                localStorage.removeItem('isAdminLoggedIn'); // অডিয়েন্স লগইন হলে অ্যাডমিন লগইন বাতিল
+                alert('সফলভাবে লগইন করা হয়েছে!');
+                showAudienceDashboard();
+            } else {
+                audienceLoginMessage.textContent = 'ভুল মোবাইল নাম্বার বা পাসওয়ার্ড।';
+                audienceLoginMessage.style.display = 'block';
+                audiencePasswordLoginInput.value = ''; // পাসওয়ার্ড ফিল্ড খালি করুন
+            }
+        }
+        audienceLoginForm.addEventListener('submit', audienceLogin);
+
+
+        function adminLogout() {
+            if (confirm('আপনি কি অ্যাডমিন প্যানেল থেকে লগআউট করতে নিশ্চিত?')) {
+                localStorage.removeItem('isAdminLoggedIn');
+                showAudienceLoginScreen(); // লগআউট করে অডিয়েন্স লগইন স্ক্রিনে ফিরে যাওয়া
+                alert('সফলভাবে লগআউট করা হয়েছে!');
+            }
+        }
+        
+        // এখানে `audienceLogout` ফাংশন সরাসরি ব্যবহৃত হচ্ছে না কারণ `toggleAdminButton` অ্যাডমিন ও অডিয়েন্সের মধ্যে টগল করে। 
+        // তবে, যদি অডিয়েন্স ড্যাশবোর্ডে একটি নির্দিষ্ট লগআউট বাটন যোগ করতে চান, তাহলে এটি ব্যবহার করতে পারেন।
+        // function audienceLogout() {
+        //     if (confirm('আপনি কি লগআউট করতে নিশ্চিত?')) {
+        //         localStorage.removeItem('isAudienceLoggedIn');
+        //         showAudienceLoginScreen();
+        //         alert('সফলভাবে লগআউট করা হয়েছে!');
+        //     }
+        // }
+
+
+        function toggleAdminPanel() {
+            const isAdminLoggedIn = localStorage.getItem('isAdminLoggedIn') === 'true';
+            const isAudienceLoggedIn = localStorage.getItem('isAudienceLoggedIn') === 'true';
+
+            if (isAdminLoggedIn) {
+                if (adminPanel.classList.contains('visible')) {
+                    showAudienceDashboard(); // অ্যাডমিন প্যানেল থেকে অডিয়েন্স ড্যাশবোর্ডে যাওয়া
+                } else {
+                    showAdminPanel(); // অডিয়েন্স ড্যাশবোর্ড থেকে অ্যাডমিন প্যানেলে যাওয়া
+                }
+            } else if (isAudienceLoggedIn) {
+                 if (audienceDashboard.classList.contains('visible')) {
+                    showLoginScreen(); // অডিয়েন্স ড্যাশবোর্ড থেকে অ্যাডমিন লগইন স্ক্রিনে যাওয়া
+                } else {
+                    // এটি সাধারণত ঘটবে না, কারণ toggleAdminButton শুধুমাত্র অ্যাডমিন বা অডিয়েন্সের ড্যাশবোর্ডে দেখা যায়
+                    showLoginScreen(); // যদি কোনোভাবে অডিয়েন্স ড্যাশবোর্ডে না থাকে, লগইন স্ক্রিনে পাঠান
+                }
+            } else {
+                // কেউ লগইন না থাকলে, অডিয়েন্স লগইন স্ক্রিনে পাঠান (ডিফল্ট)
+                showAudienceLoginScreen();
+            }
+        }
+
+        // --- অডিয়েন্স রেজিস্ট্রেশন ফাংশনালিটি ---
+        function previewProfileImage(event) {
+            const reader = new FileReader();
+            reader.onload = function() {
+                profileImagePreview.src = reader.result;
+            }
+            reader.readAsDataURL(event.target.files[0]);
+        }
+
+        registrationForm.addEventListener('submit', function(event) {
+            event.preventDefault(); // ফর্ম সাবমিট প্রতিরোধ করুন
+
+            const profilePicFile = regProfilePicInput.files[0];
+            const name = regNameInput.value.trim();
+            const dob = regDobInput.value;
+            const mobile = regMobileInput.value.trim();
+            const password = regPasswordInput.value;
+            const confirmPassword = regConfirmPasswordInput.value;
+
+            registrationMessage.style.display = 'none'; // মেসেজ রিসেট করুন
+
+            // ভ্যালিডেশন
+            if (!name || !dob || !mobile || !password || !confirmPassword) {
+                registrationMessage.textContent = 'সকল আবশ্যিক ফিল্ড পূরণ করুন।';
+                registrationMessage.style.display = 'block';
+                return;
+            }
+
+            if (!/^01[0-9]{9}$/.test(mobile)) {
+                registrationMessage.textContent = 'মোবাইল নম্বরটি ১১ ডিজিটের হতে হবে এবং ০১৮, ০১৭ ইত্যাদি দিয়ে শুরু হতে হবে।';
+                registrationMessage.style.display = 'block';
+                return;
+            }
+
+            if (password.length < 6) {
+                registrationMessage.textContent = 'পাসওয়ার্ড ন্যূনতম ৬ অক্ষরের হতে হবে।';
+                registrationMessage.style.display = 'block';
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                registrationMessage.textContent = 'পাসওয়ার্ড এবং নিশ্চিত পাসওয়ার্ড মেলেনি।';
+                registrationMessage.style.display = 'block';
+                return;
+            }
+
+            // মোবাইল নম্বর ডুপ্লিকেট চেক
+            if (registeredAudiences.some(user => user.mobile === mobile)) {
+                registrationMessage.textContent = 'এই মোবাইল নম্বরটি দিয়ে ইতিমধ্যে রেজিস্ট্রেশন করা হয়েছে।';
+                registrationMessage.style.display = 'block';
+                return;
+            }
+
+            let profilePicBase64 = '';
+            if (profilePicFile) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    profilePicBase64 = e.target.result;
+                    saveAudience(profilePicBase64, name, dob, mobile, password);
+                };
+                reader.readAsDataURL(profilePicFile);
+            } else {
+                saveAudience(profilePicBase64, name, dob, mobile, password);
+            }
+        });
+
+        function saveAudience(profilePicBase64, name, dob, mobile, password) {
+            const newAudience = {
+                profilePic: profilePicBase64,
+                name,
+                dob,
+                mobile,
+                password // পাসওয়ার্ড এনক্রিপ্ট করা উচিত, কিন্তু এই ডেমোর জন্য প্লেইন টেক্সট রাখা হলো
+            };
+            registeredAudiences.push(newAudience);
+            saveData(); // ডেটা সেভ করুন
+            
+            alert('সফলভাবে রেজিস্ট্রেশন করা হয়েছে!');
+            resetRegistrationForm();
+            showAudienceLoginScreen(); // রেজিস্ট্রেশনের পর অডিয়েন্স লগইন স্ক্রিনে নিয়ে যাওয়া
+        }
+
+        function resetRegistrationForm() {
+            regProfilePicInput.value = '';
+            profileImagePreview.src = 'http://placehold.it/120x120';
+            regNameInput.value = '';
+            regDobInput.value = '2000-01-01'; // Default date
+            regMobileInput.value = '';
+            regPasswordInput.value = '';
+            regConfirmPasswordInput.value = '';
+            registrationMessage.style.display = 'none';
+        }
+
+        // --- পাসওয়ার্ড ভুলে গেছেন ফাংশনালিটি (নতুন) ---
+        forgotPasswordForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const mobile = forgotPasswordMobileInput.value.trim();
+            forgotPasswordMessage.style.display = 'none';
+
+            if (!mobile) {
+                forgotPasswordMessage.textContent = 'দয়া করে আপনার রেজিস্টার্ড মোবাইল নাম্বার দিন।';
+                forgotPasswordMessage.style.display = 'block';
+                return;
+            }
+
+            const foundUser = registeredAudiences.find(user => user.mobile === mobile);
+            if (foundUser) {
+                // বাস্তব অ্যাপ্লিকেশনে এখানে পাসওয়ার্ড রিসেট লিংক ইমেল বা এসএমএস করা হবে
+                // এই ডেমোর জন্য, আমরা শুধুমাত্র একটি বার্তা দেখাচ্ছি
+                alert(`আপনার মোবাইল নাম্বার ${mobile} এ একটি পাসওয়ার্ড রিসেট লিংক পাঠানো হয়েছে। (এটি একটি ডেমো বার্তা)`);
+                forgotPasswordMessage.textContent = 'পাসওয়ার্ড রিসেট লিংক পাঠানো হয়েছে।';
+                forgotPasswordMessage.style.color = '#28a745'; // সফলতার বার্তা সবুজ
+                forgotPasswordMessage.style.display = 'block';
+                forgotPasswordMobileInput.value = '';
+            } else {
+                forgotPasswordMessage.textContent = 'এই মোবাইল নম্বরের কোনো অ্যাকাউন্ট খুঁজে পাওয়া যায়নি।';
+                forgotPasswordMessage.style.display = 'block';
+            }
+        });
+
+
+        // --- অ্যাডমিন প্যানেলের ফাংশনালিটি ---
+        function renderAdvisors() {
+            advisorList.innerHTML = '';
+            advisors.forEach((advisor, index) => {
+                const row = advisorList.insertRow();
+                row.innerHTML = `
+                    <td data-label="নাম">${advisor.name}</td>
+                    <td data-label="পদবী">${advisor.designation || 'নেই'}</td>
+                    <td data-label="কার্যক্রম" class="actions">
+                        <button class="animated-button secondary" onclick="editAdvisor(${index})">পরিবর্তন</button>
+                        <button class="animated-button danger" onclick="deleteAdvisor(${index})">মুছে ফেলুন</button>
+                    </td>
+                `;
+            });
+            saveData();
+        }
+        function addAdvisor() {
+            const name = advisorNameInput.value.trim();
+            const designation = advisorDesignationInput.value.trim();
+            if (name) {
+                advisors.push({ name, designation });
+                resetAdvisorForm();
+                renderAdvisors();
+                renderAudienceAdvisors(); // অডিয়েন্স ড্যাশবোর্ড আপডেট
+            } else {
+                alert('দয়া করে সদস্যের নাম লিখুন।');
+            }
+        }
+        function editAdvisor(index) {
+            editingAdvisorIndex = index;
+            const advisorToEdit = advisors[index];
+            advisorNameInput.value = advisorToEdit.name;
+            advisorDesignationInput.value = advisorToEdit.designation;
+            addAdvisorButton.style.display = 'none';
+            updateAdvisorButton.style.display = 'inline-block';
+            cancelAdvisorEditButton.style.display = 'inline-block';
+            advisorNameInput.focus();
+        }
+        function updateAdvisor() {
+            if (editingAdvisorIndex !== -1) {
+                const name = advisorNameInput.value.trim();
+                const designation = advisorDesignationInput.value.trim();
+                if (name) {
+                    advisors[editingAdvisorIndex] = { name, designation };
+                    resetAdvisorForm();
+                    renderAdvisors();
+                    renderAudienceAdvisors(); // অডিয়েন্স ড্যাশবোর্ড আপডেট
+                } else {
+                    alert('দয়া করে সদস্যের নাম লিখুন।');
+                }
+            }
+        }
+        function cancelAdvisorEdit() {
+            resetAdvisorForm();
+        }
+        function resetAdvisorForm() {
+            editingAdvisorIndex = -1;
+            advisorNameInput.value = '';
+            advisorDesignationInput.value = '';
+            addAdvisorButton.style.display = 'inline-block';
+            updateAdvisorButton.style.display = 'none';
+            cancelAdvisorEditButton.style.display = 'none';
+        }
+        function deleteAdvisor(index) {
+            if (confirm('আপনি কি এই উপদেষ্টা পরিষদ সদস্যকে মুছে ফেলতে নিশ্চিত?')) {
+                advisors.splice(index, 1);
+                renderAdvisors();
+                renderAudienceAdvisors(); // অডিয়েন্স ড্যাশবোর্ড আপডেট
+                resetAdvisorForm();
+            }
+        }
+
+        // নির্বাচন কমিশন ফাংশনালিটি
+        function renderEcMembers() {
+            ecMemberList.innerHTML = '';
+            ecMembers.forEach((member, index) => {
+                const row = ecMemberList.insertRow();
+                row.innerHTML = `
+                    <td data-label="নাম">${member.name}</td>
+                    <td data-label="পদবী">${member.designation || 'নেই'}</td>
+                    <td data-label="যোগদান">${member.joinDate || 'অজ্ঞাত'}</td>
+                    <td data-label="অবসর">${member.endDate || 'বর্তমান'}</td>
+                    <td data-label="কার্যক্রম" class="actions">
+                        <button class="animated-button secondary" onclick="editEcMember(${index})">পরিবর্তন</button>
+                        <button class="animated-button danger" onclick="deleteEcMember(${index})">মুছে ফেলুন</button>
+                    </td>
+                `;
+            });
+            saveData();
+        }
+        function addEcMember() {
+            const name = ecMemberNameInput.value.trim();
+            const designation = ecMemberDesignationInput.value.trim();
+            const joinDate = ecMemberJoinDateInput.value;
+            const endDate = ecMemberEndDateInput.value;
+            if (name) {
+                ecMembers.push({ name, designation, joinDate, endDate });
+                resetEcMemberForm();
+                renderEcMembers();
+                renderAudienceEcMembers(); // অডিয়েন্স ড্যাশবোর্ড আপডেট
+            } else {
+                alert('দয়া করে সদস্যের নাম লিখুন।');
+            }
+        }
+        function editEcMember(index) {
+            editingEcMemberIndex = index;
+            const memberToEdit = ecMembers[index];
+            ecMemberNameInput.value = memberToEdit.name;
+            ecMemberDesignationInput.value = memberToEdit.designation;
+            ecMemberJoinDateInput.value = memberToEdit.joinDate;
+            ecMemberEndDateInput.value = memberToEdit.endDate;
+            addEcMemberButton.style.display = 'none';
+            updateEcMemberButton.style.display = 'inline-block';
+            cancelEcMemberEditButton.style.display = 'inline-block';
+            ecMemberNameInput.focus();
+        }
+        function updateEcMember() {
+            if (editingEcMemberIndex !== -1) {
+                const name = ecMemberNameInput.value.trim();
+                const designation = ecMemberDesignationInput.value.trim();
+                const joinDate = ecMemberJoinDateInput.value;
+                const endDate = ecMemberEndDateInput.value;
+                if (name) {
+                    ecMembers[editingEcMemberIndex] = { name, designation, joinDate, endDate };
+                    resetEcMemberForm();
+                    renderEcMembers();
+                    renderAudienceEcMembers(); // অডিয়েন্স ড্যাশবোর্ড আপডেট
+                } else {
+                    alert('দয়া করে সদস্যের নাম লিখুন।');
+                }
+            }
+        }
+        function cancelEcMemberEdit() {
+            resetEcMemberForm();
+        }
+        function resetEcMemberForm() {
+            editingEcMemberIndex = -1;
+            ecMemberNameInput.value = '';
+            ecMemberDesignationInput.value = '';
+            ecMemberJoinDateInput.value = new Date().toISOString().split('T')[0]; // Reset to today's date
+            ecMemberEndDateInput.value = '';
+            addEcMemberButton.style.display = 'inline-block';
+            updateEcMemberButton.style.display = 'none';
+            cancelEcMemberEditButton.style.display = 'none';
+        }
+        function deleteEcMember(index) {
+            if (confirm('আপনি কি এই নির্বাচন কমিশন সদস্যকে মুছে ফেলতে নিশ্চিত?')) {
+                ecMembers.splice(index, 1);
+                renderEcMembers();
+                renderAudienceEcMembers(); // অডিয়েন্স ড্যাশবোর্ড আপডেট
+                resetEcMemberForm();
+            }
+        }
+
+        // ২০২৫-২৭ কার্যকরি পরিষদের ফাংশনালিটি
+        function renderExecutiveCouncilMembers() {
+            executiveCouncilList.innerHTML = '';
+            executiveCouncilMembers.forEach((member, index) => {
+                const row = executiveCouncilList.insertRow();
+                row.innerHTML = `
+                    <td data-label="নাম">${member.name}</td>
+                    <td data-label="পদবী">${member.designation || 'নেই'}</td>
+                    <td data-label="কার্যক্রম" class="actions">
+                        <button class="animated-button secondary" onclick="editExecutiveCouncilMember(${index})">পরিবর্তন</button>
+                        <button class="animated-button danger" onclick="deleteExecutiveCouncilMember(${index})">মুছে ফেলুন</button>
+                    </td>
+                `;
+            });
+            saveData();
+        }
+        function addExecutiveCouncilMember() {
+            const name = executiveCouncilNameInput.value.trim();
+            const designation = executiveCouncilDesignationInput.value.trim();
+            if (name) {
+                executiveCouncilMembers.push({ name, designation });
+                resetExecutiveCouncilForm();
+                renderExecutiveCouncilMembers();
+                renderAudienceExecutiveCouncilMembers(); // অডিয়েন্স ড্যাশবোর্ড আপডেট
+            } else {
+                alert('দয়া করে সদস্যের নাম লিখুন।');
+            }
+        }
+        function editExecutiveCouncilMember(index) {
+            editingExecutiveCouncilMemberIndex = index;
+            const memberToEdit = executiveCouncilMembers[index];
+            executiveCouncilNameInput.value = memberToEdit.name;
+            executiveCouncilDesignationInput.value = memberToEdit.designation;
+            addExecutiveCouncilButton.style.display = 'none';
+            updateExecutiveCouncilButton.style.display = 'inline-block';
+            cancelExecutiveCouncilEditButton.style.display = 'inline-block';
+            executiveCouncilNameInput.focus();
+        }
+        function updateExecutiveCouncilMember() {
+            if (editingExecutiveCouncilMemberIndex !== -1) {
+                const name = executiveCouncilNameInput.value.trim();
+                const designation = executiveCouncilDesignationInput.value.trim();
+                if (name) {
+                    executiveCouncilMembers[editingExecutiveCouncilMemberIndex] = { name, designation };
+                    resetExecutiveCouncilForm();
+                    renderExecutiveCouncilMembers();
+                    renderAudienceExecutiveCouncilMembers(); // অডিয়েন্স ড্যাশবোর্ড আপডেট
+                } else {
+                    alert('দয়া করে সদস্যের নাম লিখুন।');
+                }
+            }
+        }
+        function cancelExecutiveCouncilEdit() {
+            resetExecutiveCouncilForm();
+        }
+        function resetExecutiveCouncilForm() {
+            editingExecutiveCouncilMemberIndex = -1;
+            executiveCouncilNameInput.value = '';
+            executiveCouncilDesignationInput.value = '';
+            addExecutiveCouncilButton.style.display = 'inline-block';
+            updateExecutiveCouncilButton.style.display = 'none';
+            cancelExecutiveCouncilEditButton.style.display = 'none';
+        }
+        function deleteExecutiveCouncilMember(index) {
+            if (confirm('আপনি কি এই কার্যকরি পরিষদ সদস্যকে মুছে ফেলতে নিশ্চিত?')) {
+                executiveCouncilMembers.splice(index, 1);
+                renderExecutiveCouncilMembers();
+                renderAudienceExecutiveCouncilMembers(); // অডিয়েন্স ড্যাশবোর্ড আপডেট
+                resetExecutiveCouncilForm();
+            }
+        }
+
+        // খেলাধুলার সরঞ্জাম ফাংশনালিটি
+        function renderSportsEquipment() {
+            equipmentList.innerHTML = '';
+            sportsEquipment.forEach((item, index) => {
+                const row = equipmentList.insertRow();
+                row.innerHTML = `
+                    <td data-label="সরঞ্জামের নাম">${item.name}</td>
+                    <td data-label="ধরণ">${getCategoryDisplayName(item.category)}</td>
+                    <td data-label="পরিমাণ">${item.quantity}</td>
+                    <td data-label="কার্যক্রম" class="actions">
+                        <button class="animated-button secondary" onclick="editEquipment(${index})">পরিবর্তন</button>
+                        <button class="animated-button danger" onclick="deleteEquipment(${index})">মুছে ফেলুন</button>
+                    </td>
+                `;
+            });
+            saveData();
+        }
+
+        function getCategoryDisplayName(category) {
+            switch (category) {
+                case 'football': return 'ফুটবল';
+                case 'cricket': return 'ক্রিকেট';
+                case 'badminton': return 'ব্যাডমিন্টন';
+                case 'other': return 'অন্যান্য';
+                default: return category;
+            }
+        }
+
+        function addEquipment() {
+            const name = equipmentNameInput.value.trim();
+            const category = equipmentCategoryInput.value;
+            const quantity = parseInt(equipmentQuantityInput.value);
+
+            if (name && !isNaN(quantity) && quantity > 0) {
+                sportsEquipment.push({ name, category, quantity });
+                resetEquipmentForm();
+                renderSportsEquipment();
+                renderAudienceSportsEquipment(); // অডিয়েন্স ড্যাশবোর্ড আপডেট
+            } else {
+                alert('দয়া করে সরঞ্জামের নাম এবং সঠিক পরিমাণ লিখুন।');
+            }
+        }
+
+        function editEquipment(index) {
+            editingEquipmentIndex = index;
+            const itemToEdit = sportsEquipment[index];
+            equipmentNameInput.value = itemToEdit.name;
+            equipmentCategoryInput.value = itemToEdit.category;
+            equipmentQuantityInput.value = itemToEdit.quantity;
+            addEquipmentButton.style.display = 'none';
+            updateEquipmentButton.style.display = 'inline-block';
+            cancelEquipmentEditButton.style.display = 'inline-block';
+            equipmentNameInput.focus();
+        }
+
+        function updateEquipment() {
+            if (editingEquipmentIndex !== -1) {
+                const name = equipmentNameInput.value.trim();
+                const category = equipmentCategoryInput.value;
+                const quantity = parseInt(equipmentQuantityInput.value);
+
+                if (name && !isNaN(quantity) && quantity > 0) {
+                    sportsEquipment[editingEquipmentIndex] = { name, category, quantity };
+                    resetEquipmentForm();
+                    renderSportsEquipment();
+                    renderAudienceSportsEquipment(); // অডিয়েন্স ড্যাশবোর্ড আপডেট
+                } else {
+                    alert('দয়া করে সরঞ্জামের নাম এবং সঠিক পরিমাণ লিখুন।');
+                }
+            }
+        }
+
+        function cancelEquipmentEdit() {
+            resetEquipmentForm();
+        }
+
+        function resetEquipmentForm() {
+            editingEquipmentIndex = -1;
+            equipmentNameInput.value = '';
+            equipmentCategoryInput.value = 'football';
+            equipmentQuantityInput.value = '1';
+            addEquipmentButton.style.display = 'inline-block';
+            updateEquipmentButton.style.display = 'none';
+            cancelEquipmentEditButton.style.display = 'none';
+        }
+
+        function deleteEquipment(index) {
+            if (confirm('আপনি কি এই সরঞ্জামটি মুছে ফেলতে নিশ্চিত?')) {
+                sportsEquipment.splice(index, 1);
+                renderSportsEquipment();
+                renderAudienceSportsEquipment(); // অডিয়েন্স ড্যাশবোর্ড আপডেট
+                resetEquipmentForm();
+            }
+        }
+
+        // আয়-ব্যয় হিসাব ফাংশনালিটি
+        function renderTransactions() {
+            transactionList.innerHTML = '';
+            transactions.forEach((transaction, index) => {
+                const row = transactionList.insertRow();
+                const rowClass = transaction.type === 'income' ? 'income-row' : 'expense-row';
+                const amountPrefix = transaction.type === 'income' ? '+' : '-';
+                row.className = rowClass;
+                row.innerHTML = `
+                    <td data-label="তারিখ">${transaction.date || 'অজ্ঞাত'}</td>
+                    <td data-label="বিবরণ">${transaction.description}</td>
+                    <td data-label="পরিমাণ">${amountPrefix} ৳${Math.abs(transaction.amount).toFixed(2)}</td>
+                    <td data-label="ধরণ">${transaction.type === 'income' ? 'আয়' : 'ব্যয়'}</td>
+                    <td data-label="কার্যক্রম" class="actions">
+                        <button class="animated-button secondary" onclick="editTransaction(${index})">পরিবর্তন</button>
+                        <button class="animated-button danger" onclick="deleteTransaction(${index})">মুছে ফেলুন</button>
+                    </td>
+                `;
+            });
+            updateBalance();
+            saveData();
+        }
+        function updateBalance() {
+            let totalBalance = 0;
+            transactions.forEach(transaction => {
+                if (transaction.type === 'income') {
+                    totalBalance += parseFloat(transaction.amount);
+                } else {
+                    totalBalance -= parseFloat(transaction.amount);
+                }
+            });
+            currentBalanceDisplay.textContent = `৳ ${totalBalance.toFixed(2)}`;
+            currentBalanceDisplay.className = ''; // Remove existing classes
+            if (totalBalance < 0) {
+                currentBalanceDisplay.classList.add('negative');
+            } else {
+                currentBalanceDisplay.classList.add('positive');
+            }
+        }
+        function addTransaction() {
+            const description = transactionDescriptionInput.value.trim();
+            const amount = parseFloat(transactionAmountInput.value);
+            const type = transactionTypeInput.value;
+            const date = transactionDateInput.value;
+            if (description && !isNaN(amount) && amount > 0 && date) {
+                transactions.push({ description, amount, type, date });
+                resetTransactionForm();
+                renderTransactions();
+                renderAudienceTransactions(); // অডিয়েন্স ড্যাশবোর্ড আপডেট
+                updateAudienceBalance(); // অডিয়েন্স ব্যালেন্স আপডেট
+            } else {
+                alert('দয়া করে লেনদেনের বিবরণ, সঠিক পরিমাণ এবং তারিখ লিখুন।');
+            }
+        }
+        function editTransaction(index) {
+            editingTransactionIndex = index;
+            const transactionToEdit = transactions[index];
+            transactionDescriptionInput.value = transactionToEdit.description;
+            transactionAmountInput.value = transactionToEdit.amount;
+            transactionTypeInput.value = transactionToEdit.type;
+            transactionDateInput.value = transactionToEdit.date;
+            addTransactionButton.style.display = 'none';
+            updateTransactionButton.style.display = 'inline-block';
+            cancelTransactionEditButton.style.display = 'inline-block';
+            transactionDescriptionInput.focus();
+        }
+        function updateTransaction() {
+            if (editingTransactionIndex !== -1) {
+                const description = transactionDescriptionInput.value.trim();
+                const amount = parseFloat(transactionAmountInput.value);
+                const type = transactionTypeInput.value;
+                const date = transactionDateInput.value;
+                if (description && !isNaN(amount) && amount > 0 && date) {
+                    transactions[editingTransactionIndex] = { description, amount, type, date };
+                    resetTransactionForm();
+                    renderTransactions();
+                    renderAudienceTransactions(); // অডিয়েন্স ড্যাশবোর্ড আপডেট
+                    updateAudienceBalance(); // অডিয়েন্স ব্যালেন্স আপডেট
+                } else {
+                    alert('দয়া করে লেনদেনের বিবরণ, সঠিক পরিমাণ এবং তারিখ লিখুন।');
+                }
+            }
+        }
+        function cancelTransactionEdit() {
+            resetTransactionForm();
+        }
+        function resetTransactionForm() {
+            editingTransactionIndex = -1;
+            transactionDescriptionInput.value = '';
+            transactionAmountInput.value = '';
+            transactionTypeInput.value = 'income';
+            transactionDateInput.value = new Date().toISOString().split('T')[0]; // Reset to today's date
+            addTransactionButton.style.display = 'inline-block';
+            updateTransactionButton.style.display = 'none';
+            cancelTransactionEditButton.style.display = 'none';
+        }
+        function deleteTransaction(index) {
+            if (confirm('আপনি কি এই লেনদেনটি মুছে ফেলতে নিশ্চিত?')) {
+                transactions.splice(index, 1);
+                renderTransactions();
+                renderAudienceTransactions(); // অডিয়েন্স ড্যাশবোর্ড আপডেট
+                updateAudienceBalance(); // অডিয়েন্স ব্যালেন্স আপডেট
+                resetTransactionForm();
+            }
+        }
+
+        // পেশাদার ডাইনামিক ডোনেশন ফাংশনালিটি
+        function renderDonationNumbers() {
+            donationNumberList.innerHTML = '';
+            donationNumbers.forEach((donation, index) => {
+                const row = donationNumberList.insertRow();
+                row.innerHTML = `
+                    <td data-label="প্লাটফর্ম">${donation.platform}</td>
+                    <td data-label="নম্বর">${donation.number}</td>
+                    <td data-label="ধরণ">${donation.accountType === 'personal' ? 'পার্সোনাল' : donation.accountType === 'agent' ? 'এজেন্ট' : 'মার্চেন্ট'}</td>
+                    <td data-label="কার্যক্রম" class="actions">
+                        <button class="animated-button secondary" onclick="editDonationNumber(${index})">পরিবর্তন</button>
+                        <button class="animated-button danger" onclick="deleteDonationNumber(${index})">মুছে ফেলুন</button>
+                    </td>
+                `;
+            });
+            saveData();
+        }
+        function addDonationNumber() {
+            const platform = donationPlatformInput.value.trim();
+            const number = donationNumberInput.value.trim();
+            const accountType = donationAccountTypeInput.value;
+            const mobileNumberRegex = /^01[0-9]{9}$/;
+            if (platform && mobileNumberRegex.test(number)) {
+                // ডুপ্লিকেট নম্বর চেক
+                if (donationNumbers.some(d => d.number === number && d.platform === platform)) {
+                    alert('এই প্ল্যাটফর্মে এই নম্বরটি ইতিমধ্যে যুক্ত করা হয়েছে।');
+                    return;
+                }
+                donationNumbers.push({ platform, number, accountType });
+                resetDonationForm();
+                renderDonationNumbers();
+                renderAudienceDonationNumbers(); // অডিয়েন্স ড্যাশবোর্ড আপডেট
+            } else {
+                alert('দয়া করে সঠিক প্ল্যাটফর্মের নাম এবং ১১ ডিজিটের মোবাইল নম্বর লিখুন।');
+            }
+        }
+        function editDonationNumber(index) {
+            editingDonationNumberIndex = index;
+            const donationToEdit = donationNumbers[index];
+            donationPlatformInput.value = donationToEdit.platform;
+            donationNumberInput.value = donationToEdit.number;
+            donationAccountTypeInput.value = donationToEdit.accountType;
+            addDonationButton.style.display = 'none';
+            updateDonationButton.style.display = 'inline-block';
+            cancelDonationEditButton.style.display = 'inline-block';
+            donationPlatformInput.focus();
+        }
+        function updateDonationNumber() {
+            if (editingDonationNumberIndex !== -1) {
+                const platform = donationPlatformInput.value.trim();
+                const number = donationNumberInput.value.trim();
+                const accountType = donationAccountTypeInput.value;
+                const mobileNumberRegex = /^01[0-9]{9}$/;
+                if (platform && mobileNumberRegex.test(number)) {
+                    // ডুপ্লিকেট নম্বর চেক (নিজেকে বাদে)
+                    const isDuplicate = donationNumbers.some((d, idx) => 
+                        idx !== editingDonationNumberIndex && d.number === number && d.platform === platform
+                    );
+                    if (isDuplicate) {
+                        alert('এই প্ল্যাটফর্মে এই নম্বরটি ইতিমধ্যে যুক্ত করা হয়েছে।');
+                        return;
+                    }
+
+                    donationNumbers[editingDonationNumberIndex] = { platform, number, accountType };
+                    resetDonationForm();
+                    renderDonationNumbers();
+                    renderAudienceDonationNumbers(); // অডিয়েন্স ড্যাশবোর্ড আপডেট
+                } else {
+                    alert('দয়া করে সঠিক প্ল্যাটফর্মের নাম এবং ১১ ডিজিটের মোবাইল নম্বর লিখুন।');
+                }
+            }
+        }
+        function cancelDonationEdit() {
+            resetDonationForm();
+        }
+        function resetDonationForm() {
+            editingDonationNumberIndex = -1;
+            donationPlatformInput.value = '';
+            donationNumberInput.value = '';
+            donationAccountTypeInput.value = 'personal';
+            addDonationButton.style.display = 'inline-block';
+            updateDonationButton.style.display = 'none';
+            cancelDonationEditButton.style.display = 'none';
+        }
+        function deleteDonationNumber(index) {
+            if (confirm('আপনি কি এই ডোনেশন নম্বরটি মুছে ফেলতে নিশ্চিত?')) {
+                donationNumbers.splice(index, 1);
+                renderDonationNumbers();
+                renderAudienceDonationNumbers(); // অডিয়েন্স ড্যাশবোর্ড আপডেট
+                resetDonationForm();
+            }
+        }
+
+        // --- অডিয়েন্স ড্যাশবোর্ডের ফাংশনালিটি ---
+        function renderAudienceAdvisors() {
+            audienceAdvisorList.innerHTML = '';
+            advisors.forEach(advisor => {
+                const row = audienceAdvisorList.insertRow();
+                row.innerHTML = `
+                    <td data-label="নাম">${advisor.name}</td>
+                    <td data-label="পদবী">${advisor.designation || 'নেই'}</td>
+                `;
+            });
+        }
+
+        function renderAudienceEcMembers() {
+            audienceEcMemberList.innerHTML = '';
+            ecMembers.forEach(member => {
+                const row = audienceEcMemberList.insertRow();
+                row.innerHTML = `
+                    <td data-label="নাম">${member.name}</td>
+                    <td data-label="পদবী">${member.designation || 'নেই'}</td>
+                    <td data-label="যোগদান">${member.joinDate || 'অজ্ঞাত'}</td>
+                    <td data-label="অবসর">${member.endDate || 'বর্তমান'}</td>
+                `;
+            });
+        }
+
+        function renderAudienceExecutiveCouncilMembers() {
+            audienceExecutiveCouncilList.innerHTML = '';
+            executiveCouncilMembers.forEach(member => {
+                const row = audienceExecutiveCouncilList.insertRow();
+                row.innerHTML = `
+                    <td data-label="নাম">${member.name}</td>
+                    <td data-label="পদবী">${member.designation || 'নেই'}</td>
+                `;
+            });
+        }
+
+        // অডিয়েন্সের জন্য খেলাধুলার সরঞ্জাম তালিকা
+        function renderAudienceSportsEquipment() {
+            audienceEquipmentList.innerHTML = '';
+            sportsEquipment.forEach(item => {
+                const row = audienceEquipmentList.insertRow();
+                row.innerHTML = `
+                    <td data-label="সরঞ্জামের নাম">${item.name}</td>
+                    <td data-label="ধরণ">${getCategoryDisplayName(item.category)}</td>
+                    <td data-label="পরিমাণ">${item.quantity}</td>
+                `;
+            });
+        }
+
+        function renderAudienceTransactions() {
+            audienceTransactionList.innerHTML = '';
+            transactions.forEach(transaction => {
+                const row = audienceTransactionList.insertRow();
+                const rowClass = transaction.type === 'income' ? 'income-row' : 'expense-row';
+                const amountPrefix = transaction.type === 'income' ? '+' : '-';
+                row.className = rowClass;
+                row.innerHTML = `
+                    <td data-label="তারিখ">${transaction.date || 'অজ্ঞাত'}</td>
+                    <td data-label="বিবরণ">${transaction.description}</td>
+                    <td data-label="পরিমাণ">${amountPrefix} ৳${Math.abs(transaction.amount).toFixed(2)}</td>
+                    <td data-label="ধরণ">${transaction.type === 'income' ? 'আয়' : 'ব্যয়'}</td>
+                `;
+            });
+            updateAudienceBalance();
+        }
+
+        function updateAudienceBalance() {
+            let totalBalance = 0;
+            transactions.forEach(transaction => {
+                if (transaction.type === 'income') {
+                    totalBalance += parseFloat(transaction.amount);
+                } else {
+                    totalBalance -= parseFloat(transaction.amount);
+                }
+            });
+            audienceCurrentBalanceDisplay.textContent = `৳ ${totalBalance.toFixed(2)}`;
+            audienceCurrentBalanceDisplay.className = ''; // Remove existing classes
+            if (totalBalance < 0) {
+                audienceCurrentBalanceDisplay.classList.add('negative');
+            } else {
+                audienceCurrentBalanceDisplay.classList.add('positive');
+            }
+        }
+
+        function renderAudienceDonationNumbers() {
+            audienceDonationNumberList.innerHTML = '';
+            donationNumbers.forEach(donation => {
+                const row = audienceDonationNumberList.insertRow();
+                row.innerHTML = `
+                    <td data-label="প্লাটফর্ম">${donation.platform}</td>
+                    <td data-label="নম্বর">${donation.number}</td>
+                    <td data-label="ধরণ">${donation.accountType === 'personal' ? 'পার্সোনাল' : donation.accountType === 'agent' ? 'এজেন্ট' : 'মার্চেন্ট'}</td>
+                `;
+            });
+        }
+
+    </script>
+</body>
+</html>
